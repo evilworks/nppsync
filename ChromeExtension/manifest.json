@@ -1,0 +1,19 @@
+{
+	"manifest_version" : 2,
+	"name" : "NppSync",
+	"version" : "1.0",
+	"description" : "NppSync refreshes loaded local files when their source has been modified in notepad++.",
+	"icons" : {
+		"128" : "icon_128.png"
+	},
+	"page_action" : {
+		"default_title" : "NppSync",
+		"default_icon" : {
+			"19" : "icon_19_disabled.png"
+		}
+	},
+	"background" : {
+		"scripts" : ["background.js"]
+	},
+	"permissions" : ["alarms", "tabs", "http://localhost/"]
+}
