@@ -89,9 +89,13 @@ var
 		  nil, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
 		if (fh = INVALID_HANDLE_VALUE) then
 			Exit;
-		if not GetFileInformationByHandle(fh, info) then
-			Exit;
-		Str(info.ftLastWriteTime.dwLowDateTime or info.ftLastWriteTime.dwHighDateTime shl 32, Result);
+        try
+            if not GetFileInformationByHandle(fh, info) then
+                Exit;
+            Str(info.ftLastWriteTime.dwLowDateTime or info.ftLastWriteTime.dwHighDateTime shl 32, Result);
+        finally
+            CloseHandle(fh);
+        end;
 	end;
 
 	function GetResponse(const aRequest: rawbytestring): rawbytestring;
