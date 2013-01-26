@@ -89,13 +89,13 @@ var
 		  nil, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
 		if (fh = INVALID_HANDLE_VALUE) then
 			Exit;
-        try
-            if not GetFileInformationByHandle(fh, info) then
-                Exit;
-            Str(info.ftLastWriteTime.dwLowDateTime or info.ftLastWriteTime.dwHighDateTime shl 32, Result);
-        finally
-            CloseHandle(fh);
-        end;
+		try
+			if not GetFileInformationByHandle(fh, info) then
+				Exit;
+			Str(info.ftLastWriteTime.dwLowDateTime or info.ftLastWriteTime.dwHighDateTime shl 32, Result);
+		finally
+			CloseHandle(fh);
+		end;
 	end;
 
 	function GetResponse(const aRequest: rawbytestring): rawbytestring;
@@ -103,24 +103,24 @@ var
 		fls: TArray<string>;
 		req: string;
 		tkn: TTokens;
-        i: integer;
-        v: integer;
+		i  : integer;
+		v  : integer;
 	begin
 		tkn    := TextTokenize(string(aRequest));
 		Result := TextRight(tkn[1], Length(tkn[1]) - 1);
 		Result := URIDecode(Result);
 		Result := TextReplace(Result, '/', '\', True);
 		fls    := NppGetOpenFiles(nppData.nppHandle);
-        for i := 0 to Length(fls) - 1 do
-        begin
-            if (TextSame(Result, fls[i])) then
-            begin
+		for i  := 0 to Length(fls) - 1 do
+		begin
+			if (TextSame(Result, fls[i])) then
+			begin
 				Result := GetFileTimestamp(Result);
-                Result := '200 HTTP/1.1 OK' + #13#10 +
-                'content-length: ' + TextFromInt(Length(Result)) + #13#10#13#10 + Result;
-            	Exit;
-            end;
-        end;
+				Result := '200 HTTP/1.1 OK' + #13#10 +
+				  'content-length: ' + TextFromInt(Length(Result)) + #13#10#13#10 + Result;
+				Exit;
+			end;
+		end;
 	end;
 
 	procedure HandleClient;
@@ -168,7 +168,7 @@ begin
 	begin
 		sck := accept(listenSocket, psockaddr(nil), pinteger(nil));
 		if (sck = INVALID_SOCKET) then
-        	Break;
+			Break;
 		HandleClient;
 	end;
 end;
@@ -230,7 +230,7 @@ var
 begin
 	closesocket(listenSocket);
 	listenSocket := INVALID_SOCKET;
-    WaitForSingleObject(socketThread, 1000);
+	WaitForSingleObject(socketThread, 1000);
 	CloseHandle(socketThread);
 	WSACleanup;
 end;

@@ -78,12 +78,10 @@ begin
 	ZeroMemory(@pluginCommands, SizeOf(pluginCommands[0]) * Length(pluginCommands));
 
 	SetNppPluginCommandData(0, 'About...', CommandAbout, 0, False);
-    StartServer;
 end;
 
 procedure PluginFinalization;
 begin
-	StopServer;
 	FreeNppPluginCommandShortcuts;
 end;
 

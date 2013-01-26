@@ -2,6 +2,7 @@ library NppSync;
 
 {$R 'Resources.res' 'Resources.rc'}
 
+
 uses
 	Windows,
 	Messages,
@@ -14,6 +15,7 @@ uses
 procedure setInfo(aNppData: TNppData); cdecl;
 begin
 	nppData := aNppData;
+	PluginInitialization;
 end;
 
 { Returns plugin name to notepad++. }
@@ -34,9 +36,9 @@ procedure beNotified(aNotifyCode: PSCNotification); cdecl;
 begin
 	case aNotifyCode.nmhdr.code of
 		NPPN_READY:
-		PluginInitialization;
+		StartServer;
 		NPPN_SHUTDOWN:
-		PluginFinalization;
+		StopServer;
 	end;
 end;
 
@@ -52,6 +54,17 @@ begin
 	Result := {$IFDEF UNICODE}True{$ELSE}False{$ENDIF};
 end;
 
+{ Entry procedure. }
+procedure EntryProc(aEntryCode: integer);
+begin
+	case aEntryCode of
+		DLL_PROCESS_ATTACH:
+		PluginInitialization;
+		DLL_PROCESS_DETACH:
+		PluginFinalization;
+	end;
+end;
+
 exports
 	setInfo name 'setInfo',
 	getName name 'getName',
@@ -64,5 +77,7 @@ begin
 {$IFDEF DEBUG}
 	ReportMemoryLeaksOnShutdown := True;
 {$ENDIF}
+	DllProc := @EntryProc;
+	EntryProc(DLL_PROCESS_ATTACH);
 
 end.
