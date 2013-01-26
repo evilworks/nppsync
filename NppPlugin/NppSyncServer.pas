@@ -163,14 +163,14 @@ var
 	end;
 
 begin
+	Result := 0;
 	while (True) do
 	begin
 		sck := accept(listenSocket, psockaddr(nil), pinteger(nil));
 		if (sck = INVALID_SOCKET) then
-			Break;
+        	Break;
 		HandleClient;
 	end;
-	Result := 0;
 end;
 
 procedure StartServer(const aPort: word = 40500);
@@ -225,9 +225,12 @@ error:
 end;
 
 procedure StopServer;
+var
+	exitCode: cardinal;
 begin
 	closesocket(listenSocket);
 	listenSocket := INVALID_SOCKET;
+    WaitForSingleObject(socketThread, 1000);
 	CloseHandle(socketThread);
 	WSACleanup;
 end;

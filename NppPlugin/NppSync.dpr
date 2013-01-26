@@ -3,12 +3,12 @@ library NppSync;
 {$R 'Resources.res' 'Resources.rc'}
 
 uses
-  Windows,
-  Messages,
-  NppPluginInterface,
-  NppSyncMain in 'NppSyncMain.pas',
-  NppSyncServer in 'NppSyncServer.pas',
-  NppPluginUtils in 'NppPluginUtils.pas';
+	Windows,
+	Messages,
+	NppPluginInterface,
+	NppSyncMain in 'NppSyncMain.pas',
+	NppSyncServer in 'NppSyncServer.pas',
+	NppPluginUtils in 'NppPluginUtils.pas';
 
 { Gives notepad++ data to the plugin. }
 procedure setInfo(aNppData: TNppData); cdecl;
@@ -32,7 +32,12 @@ end;
 { Receives Scintilla notifications from notepad++. }
 procedure beNotified(aNotifyCode: PSCNotification); cdecl;
 begin
-	{ We don't need anything }
+	case aNotifyCode.nmhdr.code of
+		NPPN_READY:
+		PluginInitialization;
+		NPPN_SHUTDOWN:
+		PluginFinalization;
+	end;
 end;
 
 { Plugin msg proc. }
@@ -47,17 +52,6 @@ begin
 	Result := {$IFDEF UNICODE}True{$ELSE}False{$ENDIF};
 end;
 
-{ Entry procedure. }
-procedure EntryProc(aEntryCode: integer);
-begin
-	case aEntryCode of
-		DLL_PROCESS_ATTACH:
-		PluginInitialization;
-		DLL_PROCESS_DETACH:
-		PluginFinalization;
-	end;
-end;
-
 exports
 	setInfo name 'setInfo',
 	getName name 'getName',
@@ -70,6 +64,5 @@ begin
 {$IFDEF DEBUG}
 	ReportMemoryLeaksOnShutdown := True;
 {$ENDIF}
-	DllProc := @EntryProc;
-	EntryProc(DLL_PROCESS_ATTACH);
+
 end.
