@@ -15,5 +15,5 @@
 	"background" : {
 		"scripts" : ["background.js"]
 	},
-	"permissions" : ["alarms", "tabs", "http://localhost/"]
+	"permissions" : ["tabs", "http://localhost/"]
 }
