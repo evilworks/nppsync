@@ -8,7 +8,7 @@ uses
 const
 	NPP_PLUGIN_NAME: PChar        = 'NppSync';
 	NPP_PLUGIN_MODULE_NAME: PChar = 'NppSync.dll';
-	NPP_PLUGIN_VERSION: PChar     = '1.0';
+	NPP_PLUGIN_VERSION: PChar     = '1.1.0';
 	NPP_PLUGIN_FUNCTION_COUNT     = 1;
 
 var
