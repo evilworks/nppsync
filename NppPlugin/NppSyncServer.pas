@@ -85,6 +85,7 @@ var
 		fh  : HFILE;
 		info: TByHandleFileInformation;
 	begin
+    	Result := '';
 		fh := CreateFile(PChar(aFileName), GENERIC_READ, FILE_SHARE_READ or FILE_SHARE_WRITE,
 		  nil, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
 		if (fh = INVALID_HANDLE_VALUE) then
@@ -121,6 +122,7 @@ var
 				Exit;
 			end;
 		end;
+        Result := '';
 	end;
 
 	procedure HandleClient;
