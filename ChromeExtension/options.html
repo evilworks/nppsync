@@ -1,0 +1,32 @@
+<!-- This file is part of NppSync plugin by evilworks. -->
+<!-- Licence: Public Domain.                           -->
+
+<!DOCTYPE HTML>
+<head>
+<title>NppSync options</title>
+</head>
+
+<style type="text/css">
+	#buttons {
+		float: right;
+	}
+</style>
+
+<body>
+
+<fieldset>
+	<legend>Communication</legend>
+	Plugin server port: <input id="serverPort" type="number" min="0" max="65535" size="5" value="40500"/>
+	<br/>
+</fieldset>
+
+<div id="buttons">
+	<button id="defaults">Restore defaults</button>
+	<button id="save">Save Settings</button>
+	<div id="status"></div>
+</div>
+
+
+</body>
+<script src="options.js"></script>
+</html>

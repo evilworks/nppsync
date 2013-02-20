@@ -1,5 +1,4 @@
 ﻿// This file is part of NppSync plugin by evilworks.
-// Version: 1.1.0
 // Licence: Public Domain.
 
 function updateIcon(tabId, show, enabled) {
