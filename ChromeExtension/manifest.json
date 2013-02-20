@@ -19,5 +19,6 @@
 	"background" : {
 		"scripts" : ["background.js"]
 	},
+	"options_page": "options.html",
 	"permissions" : ["tabs", "http://localhost/", "file:///"]
 }
