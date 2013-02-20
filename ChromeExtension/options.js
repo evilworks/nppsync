@@ -5,17 +5,25 @@ var defaultSettings = {
   serverPort: 40500
 };
 
+function showStatus(s) {
+  var status = document.getElementById("status");
+  status.innerHTML = s;
+  setTimeout(function() {
+    status.innerHTML = "";
+  }, 1000);
+}
+
 function saveSettings() {
   // Save values.
   localStorage["serverPort"] = document.getElementById("serverPort").value;
 
-  // Update status to let user know options were saved.
-  var status = document.getElementById("status");
-  status.innerHTML = "Options Saved.";
-  setTimeout(function() {
-    status.innerHTML = "";
-  }, 1000);
+  showStatus("Settings saved.")
 };
+
+function restoreDefaults() {
+
+  showStatus("Defaults restored.")
+}
 
 function readSetting(name, ctrlId) {
   var val = localStorage[name];
@@ -31,4 +39,5 @@ function readSettings() {
 };
 
 document.addEventListener('DOMContentLoaded', readSettings);
-document.querySelector('#save').addEventListener('click', saveSettings);
+document.querySelector('#restoreDefaults').addEventListener('click', restoreDefaults);
+document.querySelector('#saveSettings').addEventListener('click', saveSettings);

@@ -122,7 +122,7 @@ var
 				Exit;
 			end;
 		end;
-        Result := '';
+        Result := '0';
 	end;
 
 	procedure HandleClient;

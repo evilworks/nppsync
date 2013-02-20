@@ -7,12 +7,41 @@
 </head>
 
 <style type="text/css">
+	* {
+		font-family: "Segoe UI, Lucida Grande, Sans";
+		font-size: 10pt;
+	}
+	
+	footer {
+		position: absolute;
+		bottom: 16px;
+	}
+	#logo img {
+		height: 64px;
+	}
+	#logo span{
+		font-size: 24pt;
+		vertical-align: top;
+	}
 	#buttons {
 		float: right;
+		
+	}
+	#status {
+		float: left;
+	}
+	.huge {
+		font-size: 32pt;
 	}
 </style>
 
 <body>
+
+<div id="logo">
+	<img src="Icon_128.png" alt="NppSync"/>
+	<span>NppSync</span>
+</div>
+
 
 <fieldset>
 	<legend>Communication</legend>
@@ -21,11 +50,16 @@
 </fieldset>
 
 <div id="buttons">
-	<button id="defaults">Restore defaults</button>
-	<button id="save">Save Settings</button>
-	<div id="status"></div>
+	<button id="restoreDefaults">Restore Defaults</button>
+	<button id="saveSettings">Save Settings</button>
 </div>
 
+<div class="huge">Options not yet implemented.</div>
+
+
+<div id="status"></div>
+
+<footer>NppSync by your friend, evilworks. 2013 - pollux@lavabit.com</footer>
 
 </body>
 <script src="options.js"></script>

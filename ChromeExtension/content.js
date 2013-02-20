@@ -18,11 +18,17 @@ function getLocalLinks(h) {
   return r
 }
 
-function messageListener(message, sender, sendResponse) {
-  if (message == 'getResources') { 
-    sendResponse(getLocalLinks(document.styleSheets).concat(getLocalLinks(document.scripts)));
-  };
-  return true;
-};
+if (nppSyncInjected === undefined) {
+  chrome.extension.onMessage.addListener(
+    function(message, sender, sendResponse) {
+      if (message == 'getResources') {
+        var styles = getLocalLinks(document.styleSheets)
+        var scripts = getLocalLinks(document.scripts)
+        var r = styles.concat(scripts)
+        sendResponse(r);
+      }
+    }
+  );
+  var nppSyncInjected = true;
+}
 
-chrome.extension.onMessage.addListener(messageListener);

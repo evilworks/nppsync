@@ -64,70 +64,86 @@ function pollResource(tabId, n) {
   }
 };
 
-function traverseResources(tabId, r) {
-  if (!r) { return }
-  for (i = 0; i < r.length; i++) {
-    pollResource(tabId, r[i]);
-  };
-};
-
 function timerCallback(tabId) {
-  chrome.tabs.get(tabId, function(tab) {
-    if (tab === undefined) {
-      delete tabData[tabId];
-      return;
-    };
-    pollResource(tabId, tab.url.split("///")[1]);
+  chrome.tabs.get(tabId, 
+    function(tab) {
+      if (tab === undefined) {
+        delete tabData[tabId];
+        return;
+      }
 
-    chrome.tabs.sendMessage(tabId, 'getResources', function(response) {
-      traverseResources(tabId, response)
-    });
-  });
+      chrome.tabs.sendMessage(tabId, "getResources", 
+        function(response) {
+          tabData[tabId].checkCount = 0;
+          tabData[tabId].needsReload = false;
+          tabData[tabId].filesCount = 0;         
+          var htmlPage = tab.url.split('///')[1];
+          for (var prop in tabData[tabId].files) {
+            if ((prop != htmlPage) && (response.indexOf(prop) < 0)) {
+              delete tabData[tabId].files[prop]
+            }
+          }
+          for (i=0; i<response.length; i++) {
+            if (tabData[tabId].files[response[i]] === undefined) {
+              tabData[tabId].files[response[i]] = {hash: '0'};           
+            }
+          }
+          for (prop in tabData[tabId].files) {
+            tabData[tabId].filesCount++;
+          }
+          for (var prop in tabData[tabId].files) {
+            pollResource(tabId, prop)
+          }
+        }
+      );
+    }
+  );
 }
 
-chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
-  if (changeInfo.status != "complete") { return };
-  if (tab.url.indexOf('file:///') < 0) { return };
+chrome.tabs.onUpdated.addListener(
+  function (tabId, changeInfo, tab) {    
+    if (changeInfo.status != "complete") { return }
+    if (tab.url.indexOf('file:///') < 0) { return }
+    if (tabData === undefined) {updateIcon(false, false)}
+        
+    chrome.tabs.executeScript(tabId, {file: "content.js"}, 
+      function(r) {
+        if (tabData[tabId] === undefined) {
+          tabData[tabId] = {
+            enabled: false,
+            checkCount: 0,
+            filesCount: 0,
+            needsReload: false,
+            files: {}
+          }
+          tabData[tabId].files[tab.url.split('///')[1]] = {hash: '0'};
+          tabData[tabId].filesCount = 1;
+        }
+        if (tabData[tabId].enabled) {
+          updateIcon(tabId, true, true);
+        } else {
+          updateIcon(tabId, true, false);
+        }       
+      }
+    );
+  }
+);
 
-  chrome.tabs.executeScript(tabId, {file: "content.js"}, function(r) {
-    if (!tabData[tabId]) {
-      tabData[tabId] = {
-        enabled: false,
-        checkCount: 0,
-        filesCount: 1,
-        needsReload: false,
-        files: {}
-      };
-      tabData[tabId].files[tab.url.split('///')[1]] = {hash: ''};
-      chrome.tabs.sendMessage(tabId, 'getResources', function(response) {
-        for (i=0; i<response.length; i++) {
-          tabData[tabId].files[response[i]] = {hash: ''};
-          tabData[tabId].filesCount++;
-        };
-      });
-      updateIcon(tabId, true, false);
-      return;
-    };
+chrome.tabs.onRemoved.addListener(
+  function (tabId, removeInfo) {
+    delete tabData[tabId];
+  }
+);
 
-    if (tabData[tabId].enabled) {
-      updateIcon(tabId, true, true);
+chrome.pageAction.onClicked.addListener(
+  function (tab) {
+    if (!tabData[tab.id].enabled) {
+      tabData[tab.id].enabled = true;
+      updateIcon(tab.id, true, true);
+      window.setTimeout(function() {timerCallback(tab.id)}, 1000);
     } else {
-      updateIcon(tabId, true, false)
-    };
-  });
-});
-
-chrome.tabs.onRemoved.addListener(function (tabId, removeInfo) {
-  delete tabData[tabId];
-});
-
-chrome.pageAction.onClicked.addListener(function (tab) {
-  if (!tabData[tab.id].enabled) {
-    tabData[tab.id].enabled = true;
-    updateIcon(tab.id, true, true);
-    window.setTimeout(function() {timerCallback(tab.id)}, 1000);
-  } else {
-    tabData[tab.id].enabled = false;
-    updateIcon(tab.id, true, false);
-  };
-});
+      tabData[tab.id].enabled = false;
+      updateIcon(tab.id, true, false);
+    }
+  }
+);

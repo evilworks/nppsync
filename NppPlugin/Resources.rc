@@ -1,6 +1,6 @@
 1 VERSIONINFO
-FILEVERSION 1,1,0,0
-PRODUCTVERSION 1,1,0,0
+FILEVERSION 1,2,0,0
+PRODUCTVERSION 1,2,0,0
 FILEOS 0x00000004
 FILETYPE 0x00000002
 BEGIN
@@ -12,10 +12,10 @@ BEGIN
       VALUE "LegalTrademarks", "None\0"
       VALUE "ProductName", "NppSync notepad++ plugin\0"
       VALUE "Comments", "fsdsfd!\0"
-      VALUE "ProductVersion", "1.1.0\0"
+      VALUE "ProductVersion", "1.2.0\0"
       VALUE "FileDescription", "NppSync notepad++ plugin\0"
       VALUE "CompanyName", "EvilWorks\0"
-      VALUE "FileVersion", "1.1.0\0"
+      VALUE "FileVersion", "1.2.0\0"
       VALUE "LegalCopyright", "None\0"
       VALUE "InternalName", "NppSync\0"
     END
