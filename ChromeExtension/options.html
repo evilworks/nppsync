@@ -1,7 +1,6 @@
+<!DOCTYPE HTML>
 <!-- This file is part of NppSync plugin by evilworks. -->
 <!-- Licence: Public Domain.                           -->
-
-<!DOCTYPE HTML>
 <head>
 <title>NppSync options</title>
 </head>
@@ -10,11 +9,22 @@
 	* {
 		font-family: "Segoe UI, Lucida Grande, Sans";
 		font-size: 10pt;
+        box-sizing: border-box;
 	}
 	
+    table {
+        width:100%;
+    }
+    
+    table th {
+        white-space: nowrap;
+        width: 10%;
+        text-align: left;
+    }
+    
 	footer {
 		position: absolute;
-		bottom: 16px;
+		bottom: 13px;
 	}
 	#logo img {
 		height: 64px;
@@ -24,15 +34,22 @@
 		vertical-align: top;
 	}
 	#buttons {
-		float: right;
+		float: left;
 		
 	}
 	#status {
-		float: left;
+		float: right;
+        padding: 7px;
+        font-size:110%;
 	}
-	.huge {
-		font-size: 32pt;
-	}
+    
+    .value input {
+        width: 95%;
+    }
+    
+    td.eq { 
+        width: 1%;
+    }
 </style>
 
 <body>
@@ -40,27 +57,59 @@
 <div id="logo">
 	<img src="Icon_128.png" alt="NppSync"/>
 	<span>NppSync</span>
+    <div id="status"></div>
 </div>
 
 
 <fieldset>
 	<legend>Communication</legend>
-	Plugin server port: <input id="serverPort" type="number" min="0" max="65535" size="5" value="40500"/>
-	<br/>
+    <form name="opt">
+        <table>
+            <tr>
+                <th>Plugin server name:</th>
+                <td><input id="serverName" name="serverName" type="text" size="10" value="localhost"/></td>
+            </tr>
+            <tr>
+                <th>Plugin server port:</th>
+                <td><input id="serverPort" name="serverPort" type="number" min="0" max="65535" size="5" value="40500"/></td>
+            </tr>
+            <tr>
+                <th>Ping interval (s):</th>
+                <td><input id="pingInterval" name="pingInterval" type="number" min="54" size="5" value="1000"/></td>
+            </tr>            
+        </table>
+    </form>
+    <div id="buttons">
+        <button id="restoreDefaults">Restore Defaults</button>
+        <button id="saveSettings">Save Settings</button>
+    </div>
 </fieldset>
 
-<div id="buttons">
-	<button id="restoreDefaults">Restore Defaults</button>
-	<button id="saveSettings">Save Settings</button>
-</div>
+<br />
+<fieldset>
+	<legend>Address Map</legend>
+	<form name="map">
+        <button id="addAddress" type="button" name="add">Add Address</button>
+		<table id="addresses">
+			<tr data-tpl="map_row" style="display:none">
+				<th class="key"><span name="key">%key%</span></th>
+                <td class="eq"> = </td>
+				<td class="value"><input name="value" type="text" size="100" value="%value%" /></td>
+			</tr>
+		</table>
+	</form>
+</fieldset>
 
-<div class="huge">Options not yet implemented.</div>
 
-
-<div id="status"></div>
-
-<footer>NppSync by your friend, evilworks. 2013 - pollux@lavabit.com</footer>
+<footer>
+    NppSync by your friends, 
+    evilworks &lt;pollux@lavabit.com&gt; &
+    DUzun     &lt;duzun@icasa.md&gt; 
+    - 2013 -
+</footer>
 
 </body>
+<script src="jquery-1.10.2.min.js"></script>
+<script src="nppsync.js"></script>
 <script src="options.js"></script>
 </html>

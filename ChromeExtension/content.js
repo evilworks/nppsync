@@ -1,35 +1,45 @@
-// This file is part of NppSync plugin by evilworks.
+// This file is part of NppSync plugin by DUzun (original version by evilworks).
 // Licence: Public Domain.
 
-var nppSyncInjected = false
+!function $_nppsync(win,doc,O,A,F,S,N,U) {
 
-function getLocalLinks(h) {
-	var r = []
-	for (i = 0; i < h.length; i++) {
-		if (h[i].href) {
-			if (h[i].href.indexOf('file:///') > -1) {
-				r[r.length] = h[i].href.split('///')[1]
-			}
-		}
-		if (h[i].src) {
-			if (h[i].src.indexOf('file:///') > -1) {
-				r[r.length] = h[i].src.split('///')[1]
-			}
-		}
-	}
-	return r
-}
+    'nppSyncInjected' in win || (win.nppSyncInjected = 0);
+    nppSyncInjected++;
+    if (nppSyncInjected > 1) return ;
 
-if (!nppSyncInjected) {
-	nppSyncInjected = true
-	chrome.extension.onMessage.addListener(
-		function (message, sender, sendResponse) {
-			if (message == 'getResources') {
-				var styles = getLocalLinks(document.styleSheets)
-				var scripts = getLocalLinks(document.scripts)
-				var r = styles.concat(scripts)
-				sendResponse(r)
-			}
-		}
-	)
-}
+    var API = {};
+
+    function now() { return (new Date).getTime() };
+
+    function log() { console.log.apply(console, arguments); }; // for developping only!
+
+    function getLocalLinks(h,r,o) {
+        r || (r = {});
+        for (var i = 0, l = h.length, e, t, q; i < l; i++) {
+            e = h[i];
+            if ( (t = e.href) || (t = e.src) ) {
+                if(q = r[t]) q[q.length] = e;
+                else r[t] = [e];
+                if(o) o[o.length] = e;
+            }
+        }
+        return r
+    }
+
+    API.getResources = function getResources(sender, sendResponse) {
+        var r = {}, a;
+        var t = now();
+        getLocalLinks(doc.styleSheets, r);
+        getLocalLinks(doc.scripts, r);
+        a = O.keys(r);
+        sendResponse(a);
+    }
+
+    chrome.extension.onMessage.addListener( function(message, sender, sendResponse) {
+        if(typeof API[message] == 'function') {
+            API[message].call(API, sender, sendResponse);
+        } else {
+            sendResponse(new Error('Unknown message "'+message+'" in content.js'));
+        }
+    } );
+}(window, document, Object, Array, Function, String, Number);

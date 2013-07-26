@@ -30,126 +30,164 @@ function updateIcon(tabId, show, enabled) {
 
 var tabData = {};
 
+var tabData = {};
+
 function pollResource(tabId, n) {
-	var r = new XMLHttpRequest();
-	r.open("GET", "http://localhost:40500/" + encodeURIComponent(n), true);
-	r.onreadystatechange = function () {
-		if (r.readyState == 4) {
-			chrome.tabs.get(tabId,
-				function (tab) {
-				if (tab !== undefined) {
-					tabData[tabId].checkCount++;
-					if (r.responseText != tabData[tabId].files[n].hash) {
-						tabData[tabId].files[n].hash = r.responseText;
-						tabData[tabId].needsReload = true;
-					};
-					if (tabData[tabId].checkCount == tabData[tabId].filesCount) {
-						if (tabData[tabId].needsReload) {
-							chrome.tabs.reload(tabId, {
-								bypassCache : true
-							});
-						};
-						tabData[tabId].checkCount = 0;
-						tabData[tabId].needsReload = false;
-						if (tabData[tabId].enabled) {
-							window.setTimeout(function () {
-								timerCallback(tabId)
-							}, 1000);
-						};
-					};
-				};
-			});
-		};
-	};
-	try {
-		r.send();
-	} catch (err) {
-		console.log(err);
-	}
+    nppsync.request(n, function (response) {
+        chrome.tabs.get(tabId, function(tab) {
+            if (tab !== undefined) {
+                var td = tabData[tabId];
+                td.checkCount++;
+                if (response != td.files[n].hash) {
+                   
+                    // log([n, response])
+                    // log(td)
+                    
+                    td.files[n].hash = response;
+                    td.needsReload = true;
+                };
+                if (td.checkCount == td.filesCount) {         
+                    if (td.needsReload) {
+                        chrome.tabs.reload(tabId, {bypassCache: true});
+                    };
+                    td.checkCount = 0;
+                    td.needsReload = false;
+                    if (td.enabled) {
+                        window.setTimeout(function() {timerCallback(tabId)}, nppsync.get('pingInterval')||1e3);
+                    };
+                };
+            };
+        });    
+    }, function (error,x) {
+        console.log(error,x);
+    });
 };
 
 function timerCallback(tabId) {
-	chrome.tabs.get(tabId, function (tab) {
-		if (tab === undefined) {
-			return;
-		}
+    chrome.tabs.get(tabId, 
+        function(tab) {
+            if (tab === undefined) {
+                delete tabData[tabId];
+                return;
+            }
+        
+            chrome.tabs.sendMessage(tabId, "getResources", 
+                function tabMessageRes(response) {
+                    var td = tabData[tabId],
+                        respath = {};
+                        
+                    td.filesCount =
+                    td.checkCount = 0;
+                    td.needsReload = false;
+                    
+                    nppsync.each(response, function (i, h, f) {
+                        f = nppsync.filepath(h);
+                        if(f) {
+                            respath[f] = h;
+                            if( !td.files[f] ) {
+                                td.files[f] = {hash: '0'};           
+                            }
+                        }
+                    });
+                    
+                    nppsync.each(td.files, function (i) {
+                        if (i != td.tabfile && i != td.tabroot && !(i in respath)) {
+                            delete td.files[i]
+                        }
+                    });
 
-		chrome.tabs.sendMessage(tabId, "getResources",
-			function (response) {
-			tabData[tabId].checkCount = 0;
-			tabData[tabId].needsReload = false;
-			tabData[tabId].filesCount = 0;
-			var htmlPage = tab.url.split('///')[1];
-			for (var prop in tabData[tabId].files) {
-				if ((prop != htmlPage) && (response.indexOf(prop) < 0)) {
-					delete tabData[tabId].files[prop]
-				}
-			}
-			for (i = 0; i < response.length; i++) {
-				if (tabData[tabId].files[response[i]] === undefined) {
-					tabData[tabId].files[response[i]] = {
-						hash : '0'
-					};
-				}
-			}
-			for (prop in tabData[tabId].files) {
-				tabData[tabId].filesCount++;
-			}
-			for (var prop in tabData[tabId].files) {
-				pollResource(tabId, prop)
-			}
-		});
-	});
+                    td.filesCount = Object.keys(td.files).length;
+                    // log(td.files)
+                    nppsync.each(td.files, function (i) {
+                        pollResource(tabId, i)
+                    });
+                }
+            );
+        }
+    );
 }
 
-chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
-	if (changeInfo.status != "complete") {
-		return
-	}
-	if (tab.url.indexOf('file:///') < 0) {
-		return
-	}
-	if (tabData === undefined) {
-		updateIcon(false, false)
-	}
+function updateIcon(tabId, show, enabled) {
+    if (show) {
+        chrome.pageAction.show(tabId);
+        if (enabled) {
+            chrome.pageAction.setIcon({
+                tabId : tabId,
+                path  : "icon_19_enabled.png"
+            });
+            chrome.pageAction.setTitle({
+                tabId : tabId,
+                title : "NppSync is enabled."
+            });
+        } else {
+            chrome.pageAction.setIcon({
+                tabId : tabId,
+                path  : "icon_19_disabled.png"
+            });
+            chrome.pageAction.setTitle({
+                tabId : tabId,
+                title : "NppSync is disabled."
+            });
+        }
+    } else {
+        chrome.pageAction.hide(tabId);
+    };
+};
 
-	chrome.tabs.executeScript(tabId, {
-		file : "content.js"
-	}, function (r) {
-		if (tabData[tabId] === undefined) {
-			tabData[tabId] = {
-				enabled : false,
-				checkCount : 0,
-				filesCount : 0,
-				needsReload : false,
-				files : {}
-			}
-			tabData[tabId].files[tab.url.split('///')[1]] = {
-				hash : '0'
-			};
-			tabData[tabId].filesCount = 1;
-		}
-		if (tabData[tabId].enabled) {
-			updateIcon(tabId, true, true);
-		} else {
-			updateIcon(tabId, true, false);
-		}
-	});
-});
 
-chrome.tabs.onRemoved.addListener(function (tabId, removeInfo) {
-	delete tabData[tabId];
-});
+chrome.tabs.onUpdated.addListener(
+    function onTabUpdated(tabId, changeInfo, tab) {    
+        if (changeInfo.status != "complete") { return }
+        var tabfile = nppsync.filepath(tab.url);
+        if (!tabfile) { return }
+        var tabroot = nppsync.rootpath(tab.url);
+        if (tabData === undefined) {updateIcon(false, false)}
+            
+        chrome.tabs.executeScript(tabId, {file: "content.js"}, 
+            function(r) {
+                var td = tabData[tabId];
+                if (td === undefined) {
+                    tabData[tabId] = td = {
+                        enabled: false,
+                        checkCount: 0,
+                        filesCount: 0,
+                        needsReload: false,
+                        tabfile: tabfile,
+                        files: {}
+                    };
+                    if(tabroot) td.tabroot = tabroot;
+                    td.files[tabroot || tabfile] = {hash: '0'};
+                    td.filesCount = 1;
+                }
+                if (tabData[tabId].enabled) {
+                    updateIcon(tabId, true, true);
+                } else {
+                    updateIcon(tabId, true, false);
+                }       
+            }
+        );
+    }
+);
 
-chrome.pageAction.onClicked.addListener(function (tab) {
-	if (!tabData[tab.id].enabled) {
-		tabData[tab.id].enabled = true;
-		updateIcon(tab.id, true, true);
-		window.setTimeout(function () {
-			timerCallback(tab.id)
-		}, 1000);
-	} else {
-		tabData[tab.id].enabled = false;
-		updateIcon(tab.id, true, false);
-	}
-});
+chrome.tabs.onRemoved.addListener(
+    function onTabRemove(tabId, removeInfo) {
+        delete tabData[tabId];
+    }
+);
+
+chrome.pageAction.onClicked.addListener(
+    function onActionClick(tab) {
+        var id = tab.id,
+            td = tabData[id];
+        if (!td.enabled) {
+            td.enabled = true;
+            updateIcon(id, true, true);
+            window.setTimeout(function() {
+                timerCallback(id)
+            }, nppsync.get('pingInterval')||1e3);
+        } else {
+            td.enabled = false;
+            updateIcon(id, true, false);
+        }
+    }
+);

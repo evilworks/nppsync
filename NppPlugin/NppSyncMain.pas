@@ -3,12 +3,12 @@ unit NppSyncMain;
 interface
 
 uses
-	Windows, NppPluginInterface;
+	Winapi.Windows, NppPluginInterface;
 
 const
 	NPP_PLUGIN_NAME: PChar        = 'NppSync';
 	NPP_PLUGIN_MODULE_NAME: PChar = 'NppSync.dll';
-	NPP_PLUGIN_VERSION: PChar     = '1.2.0';
+	NPP_PLUGIN_VERSION: PChar     = '1.3.0';
 	NPP_PLUGIN_FUNCTION_COUNT     = 1;
 
 var
