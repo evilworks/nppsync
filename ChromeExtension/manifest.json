@@ -27,6 +27,7 @@
         "http://localhost/*",
         "http://127.0.0.1/*",
         "http://*.lh/*",
+        "http://*.com/*",
         "file:///*"
     ]
 }

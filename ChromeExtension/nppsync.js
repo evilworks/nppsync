@@ -11,6 +11,7 @@
             serverPort: 40500
             , serverName: 'localhost'
             , pingInterval: 1e3
+            , resourcesInterval: 15e3
           }
         , prot = {
             map: U
@@ -73,7 +74,12 @@
    
     function NppSync() {
         this.opt = {};
-        this.map = this.get('map') || {};
+        this.map = this.get('map') || [];
+        if(!(this.map instanceof Array)) {
+            var t = [];
+            each(this.map, function (k,v) { t.push([k,v]) });
+            this.map = t;
+        }
     } ;
     
     prot.each    = each   ;
@@ -141,9 +147,10 @@
             case 'https:':
             default: {
                 var map = self.get('map');
-                url = url.href;
-                self.each(map, function (u, f) {
-                    if(url.indexOf(u) === 0) {
+                url = url.origin + url.pathname;
+                self.each(map, function (i, a, u, f) {
+                    if(url.indexOf(u = a[0]) === 0) {
+                        f = a[1];
                         if(f.substr(f.length-1) != DS) f += DS;
                         root = f.replace(eds, DS);
                         return false
@@ -168,9 +175,10 @@
             case 'https:':
             default: {
                 var map = self.get('map');
-                url = url.href;
-                self.each(map, function (u, f) {
-                    if(url.indexOf(u) === 0) {
+                url = url.origin + url.pathname;
+                self.each(map, function (i, a, u, f) {
+                    if(url.indexOf(u = a[0]) === 0) {
+                        f = a[1];
                         if(f.substr(f.length-1) != DS) f += DS;
                         file = (f + url.substr(u.length)).replace(eds, DS);
                         return false;
@@ -181,7 +189,7 @@
         return file;
     } ;
     
-    prot.request = function rqst(r, success, error) {
+    prot.request = function request(r, success, error) {
         var self = this,
             x = new XMLHttpRequest();
         

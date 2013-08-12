@@ -47,7 +47,11 @@
         width: 95%;
     }
     
-    td.eq { 
+    .idx input {
+        width:41px;
+    }
+    
+    td.idx, td.eq { 
         width: 1%;
     }
 </style>
@@ -92,6 +96,7 @@
         <button id="addAddress" type="button" name="add">Add Address</button>
 		<table id="addresses">
 			<tr data-tpl="map_row" style="display:none">
+				<td class="idx"><input name="idx" type="number" size="2" value="%idx%" step="1" /></td>
 				<th class="key"><span name="key">%key%</span></th>
                 <td class="eq"> = </td>
 				<td class="value"><input name="value" type="text" size="100" value="%value%" /></td>

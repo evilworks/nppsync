@@ -19,49 +19,75 @@
             }
         });
         
-        var map = {};
-        $(doc.forms.map.elements).each(function (i, e, k, v) {
+        var map = [], 
+            idx = 0,
+            r = function (tr, nm, hd) {
+                    var kd = tr.find('.'+nm),
+                        t = kd.find('input:first'), k;
+                    if(t.length) {
+                        k = $.trim(t.val());
+                        tr.find('[name='+nm+']').text(k);
+                        hd && t.hide();
+                    } else {
+                        k = $.trim(kd.text());
+                    }                
+                return k
+            } ;
+            
+        
+        $(doc.forms.map.elements).each(function (i, e) {
             if(e.name == 'value') {
-                var tr = $(e).closest('tr'), kd, vd;
+                var tr = $(e).closest('tr'), k, v, x, t;
                 if(!tr.is(':visible')) return;
                 
-                kd = tr.find('.key');
-                vd = tr.find('.value');
-                    
-                k = kd.find('input:first');
-                k = $.trim(k.length ? k.val() : kd.text());
-                v = $.trim(e.value);
-                
+                k = r(tr, 'key', true);
+                v = r(tr, 'value', false);
+                x = parseFloat(r(tr, 'idx', false));
+
                 if(k && v) {
-                    map[k] = v;
+                    map[idx] = [k,v];
+                    map[idx].x = x;
+                    ++idx;
                 } else {
                     tr.remove();
                 }
             }
         });
-        
+        map.sort(function (a,b){return a.x - b.x});
         ny.set('map', map);
         
         showStatus("Settings saved.")
     };
 
     function addMapRow(k,v) {
-        var o = {key: k||'', value: v||''},
-            row = $(ny.parse_tpl(ny.tpl.map_row, o)),
-            t;
-        if(!k) {
+        var o = {key: '', value: '', idx: ''},
+            row, t;
+        if(k != null) {
+            if(v instanceof Array) {
+                o.key = v[0];
+                o.value = v[1];
+                o.idx = k;
+            } else if(v) {
+                o.key = k;
+                o.value = v;
+            } else return ;
+        }
+        row = $(ny.parse_tpl(ny.tpl.map_row, o));
+        if(k == null) {
             t = $('<input type="text" name="key" value="" />');
             row.find('.key').append(t);
-            t.on('blur', function () {
-                v = $.trim(t.val());
-                if(v != '') {
-                    row.find('[name=key]').text(v);
-                    t.hide()
-                }
-            });
+            // t.on('blur', function () {
+                // v = $.trim(t.val());
+                // if(v != '') {
+                    // row.find('[name=key]').text(v);
+                    // t.hide()
+                // }
+            // });
+            $(ny.tple.map_row).after(row);
+            row.find(':text:first').focus();
+        } else {
+            $(ny.tple.map_row).parent().append(row);
         }
-        $(ny.tple.map_row).after(row);
-        k || row.find(':text:first').focus();
         return row;
     }
     
@@ -93,7 +119,7 @@
         var map = ny.get('map');
         
         if(ny.isEmpty(map)) map = {'http://localhost/' : 'd:\\www\\'};
-        
+        // log(map)
         ny.each(map, addMapRow);
     };
 

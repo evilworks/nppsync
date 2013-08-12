@@ -32,23 +32,49 @@ var tabData = {};
 
 var tabData = {};
 
+function log() { console.log.apply(console, arguments); }; // for developping only!
+
 function pollResource(tabId, n) {
     nppsync.request(n, function (response) {
         chrome.tabs.get(tabId, function(tab) {
             if (tab !== undefined) {
-                var td = tabData[tabId];
+                var td = tabData[tabId], 
+                    st = td.categ && td.categ.styles;
                 td.checkCount++;
                 if (response != td.files[n].hash) {
-                   
-                    // log([n, response])
-                    // log(td)
-                    
                     td.files[n].hash = response;
-                    td.needsReload = true;
+                    if(st && st[n]) {
+                        if(!td.styles) td.styles = {};
+                        td.styles[n] = response;
+                        td.needsStyleUpdate = n;
+                    }
+                    td.needsReload = response;
                 };
                 if (td.checkCount == td.filesCount) {         
                     if (td.needsReload) {
-                        chrome.tabs.reload(tabId, {bypassCache: true});
+                        if(td.categ && td.categ.styles) {
+                            nppsync.each(td.categ.styles, function (f) {
+                                var h = td.files[f];
+                                if(h) h = h.hash;
+                                if(h == td.needsReload) td.needsReload = false;
+                            });
+                        }
+                        if(td.needsReload) {
+                            chrome.tabs.reload(tabId, {bypassCache: true});
+                        } else {
+                            if(td.styles) {
+                                nppsync.each(td.styles, function (f, v) {
+                                    chrome.tabs.sendMessage(tabId, 
+                                        { api: 'updateStyle', 
+                                          url: td.categ.styles[f],
+                                          hash: v }, 
+                                        function (response) {
+                                            td.filesTs = 0;
+                                        }
+                                    )
+                                })
+                            }
+                        }
                     };
                     td.checkCount = 0;
                     td.needsReload = false;
@@ -63,46 +89,75 @@ function pollResource(tabId, n) {
     });
 };
 
-function timerCallback(tabId) {
-    chrome.tabs.get(tabId, 
-        function(tab) {
-            if (tab === undefined) {
-                delete tabData[tabId];
-                return;
-            }
-        
-            chrome.tabs.sendMessage(tabId, "getResources", 
-                function tabMessageRes(response) {
-                    var td = tabData[tabId],
-                        respath = {};
-                        
-                    td.filesCount =
-                    td.checkCount = 0;
-                    td.needsReload = false;
+function pollResources(tabId, res) {
+    var td = tabData[tabId], 
+        to = 0;
+    if(!td) return false;
+    
+    td.needsReload = false;
+    td.checkCount = 0;
+    nppsync.each(res, function (i) {
+        setTimeout(function () {
+            pollResource(tabId, i)
+        }, to += 13);
+    });
+    return res
+};
+
+function getResources(tabId, clb) {
+    if(clb) {
+        chrome.tabs.sendMessage(tabId, 
+            { api: 'getResources', categorize: true }, 
+            function tabMessageRes(response) {
+                var td = tabData[tabId],
+                    respath = {};
                     
-                    nppsync.each(response, function (i, h, f) {
+                td.filesCount = 0;
+                td.filesTs = nppsync.now();
+                
+                nppsync.each(response, function (c, l, cf) {
+                    td.categ[c] = cf = {};
+                    nppsync.each(l, function (i, h, f) {
                         f = nppsync.filepath(h);
                         if(f) {
+                            cf[f] = h;
                             respath[f] = h;
                             if( !td.files[f] ) {
                                 td.files[f] = {hash: '0'};           
                             }
                         }
                     });
-                    
-                    nppsync.each(td.files, function (i) {
-                        if (i != td.tabfile && i != td.tabroot && !(i in respath)) {
-                            delete td.files[i]
-                        }
-                    });
+                })
+                
+                nppsync.each(td.files, function (i) {
+                    if (i != td.tabfile && i != td.tabroot && !(i in respath)) {
+                        delete td.files[i]
+                    }
+                });
 
-                    td.filesCount = Object.keys(td.files).length;
-                    // log(td.files)
-                    nppsync.each(td.files, function (i) {
-                        pollResource(tabId, i)
-                    });
-                }
-            );
+                td.filesCount = Object.keys(td.files).length;
+
+                if(clb instanceof Function) clb.call(td, tabId, td.files, td.filesCount);
+            }
+        );
+    }
+    return tabData[tabId].files;
+}
+
+function timerCallback(tabId) {
+    chrome.tabs.get(
+        tabId, 
+        function(tab) {
+            if (tab === undefined) {
+                delete tabData[tabId];
+                return ;
+            }
+            var td = tabData[tabId];
+            if(!td || !td.files || td.filesCount < 2 || nppsync.get('resourcesInterval') < nppsync.now() - td.filesTs) {
+                getResources(tabId, pollResources);
+            } else {
+                pollResources.call(td, tabId, td.files);
+            }
         }
     );
 }
@@ -153,7 +208,8 @@ chrome.tabs.onUpdated.addListener(
                         filesCount: 0,
                         needsReload: false,
                         tabfile: tabfile,
-                        files: {}
+                        files: {},
+                        categ: {}
                     };
                     if(tabroot) td.tabroot = tabroot;
                     td.files[tabroot || tabfile] = {hash: '0'};
@@ -182,9 +238,7 @@ chrome.pageAction.onClicked.addListener(
         if (!td.enabled) {
             td.enabled = true;
             updateIcon(id, true, true);
-            window.setTimeout(function() {
-                timerCallback(id)
-            }, nppsync.get('pingInterval')||1e3);
+            window.setTimeout(function() { timerCallback(id) }, nppsync.get('pingInterval')||1e3);
         } else {
             td.enabled = false;
             updateIcon(id, true, false);

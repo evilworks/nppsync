@@ -35,3 +35,6 @@ Public domain / Free for all
 Options page works now! 
 You can add address map from `http://localhost/*` to file(system) path.
 Track changing of any file in the path (open in npp) and refreshes browser page on save.
+
+1.3.1 - `<link href="*.css" />` are updated dynamically, without page refresh. 
+The href attribute get `&v=<hash>` appended at each .css file change.
