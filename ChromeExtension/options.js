@@ -1,4 +1,4 @@
-!function $_(win,doc,O,A,F,S,N,$,ny,U) {
+(function $_(win,doc,O,A,F,S,N,$,ny,U) {
     $  = win.jQuery;
     ny = win.nppsync;
     
@@ -8,7 +8,7 @@
         setTimeout(function() {
             st.fadeOut();
         }, 3e3);
-    };
+    }
 
     function saveSettings() {
         ny.each(doc.forms.opt.elements, function (i, e, v) {
@@ -27,11 +27,11 @@
                     if(t.length) {
                         k = $.trim(t.val());
                         tr.find('[name='+nm+']').text(k);
-                        hd && t.hide();
+                        if ( hd ) t.hide();
                     } else {
                         k = $.trim(kd.text());
                     }                
-                return k
+                return k;
             } ;
             
         
@@ -53,11 +53,11 @@
                 }
             }
         });
-        map.sort(function (a,b){return a.x - b.x});
+        map.sort(function (a,b){return a.x - b.x;});
         ny.set('map', map);
         
-        showStatus("Settings saved.")
-    };
+        showStatus("Settings saved.");
+    }
 
     function addMapRow(k,v) {
         var o = {key: '', value: '', idx: ''},
@@ -98,7 +98,7 @@
                 if(isNaN(v)) {
                     e.value = v;
                 } else {
-                    $(e).counto(v)
+                    $(e).counto(v);
                 }
             }
         });
@@ -121,7 +121,7 @@
         if(ny.isEmpty(map)) map = {'http://localhost/' : 'd:\\www\\'};
         // log(map)
         ny.each(map, addMapRow);
-    };
+    }
 
     function addAddress(evt) {
         addMapRow(); 
@@ -137,11 +137,11 @@
             if(isNaN(v)) {
                 e.value = v;
             } else {
-                $(e).counto(v)
+                $(e).counto(v);
             }
-        })
-        showStatus("Defaults restored.")
-    };
+        });
+        showStatus("Defaults restored.");
+    }
     
     /* ------------------------------------------------------------------- */
     $(loadSettings);
@@ -159,7 +159,7 @@
             $t.unwrap();
             return content;
         }
-    } 
+    };
 
     /// Nice count to nr (by DUzun)
     $.fn.counto = function cto (nr,dl,done) {
@@ -225,9 +225,9 @@
             if(!r) {
                 expr[s] = r = new RegExp('%' + s + '%', 'g');
             }
-            str = str.replace(r, v)
+            str = str.replace(r, v);
         });
-        return str
+        return str;
     } ;    
-}(window, document, Object, Array, Function, String, Number);
-
+}
+(window, document, Object, Array, Function, String, Number));

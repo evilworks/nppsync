@@ -1,7 +1,7 @@
 // This file is part of NppSync plugin by DUzun (original version by evilworks).
 // Licence: Public Domain.
 
-!function $_nppsync(win,doc,O,A,F,S,N,U) {
+(function $_nppsync(win,doc,O,A,F,S,N,U) {
 
     'nppSyncInjected' in win || (win.nppSyncInjected = 0);
     nppSyncInjected++;
@@ -9,9 +9,9 @@
 
     var API = {};
 
-    function now() { return (new Date).getTime() };
+    function now() { return (new Date()).getTime(); }
 
-    function log() { console.log.apply(console, arguments); }; // for developping only!
+    function log() { console.log.apply(console, arguments); } // for developping only!
     
     function getLocalLinks(h,r) {
         var i, l, e, t, q, p;
@@ -29,7 +29,7 @@
                 }
             }
         }
-        return r
+        return r;
     }
     
     API.getResources = function getResources(message, sendResponse) {
@@ -64,8 +64,8 @@
             if(url && url.indexOf(u) === 0) {
                 url = url.replace(/(\?|&)v=[^&]+/, '');
                 url += (url.indexOf('?') < 0 ? '?' : '&') + 'v=' + v;
-                try{this[prop]=url}catch(err){}
-                try{this.ownerNode[prop]=url}catch(err){}
+                try{this[prop]=url;}catch(err){}
+                try{this.ownerNode[prop]=url;}catch(err){}
             }
         }));
         sendResponse && sendResponse(a);    
@@ -82,4 +82,5 @@
             sendResponse(new Error('Unknown message "'+clb+'" in content.js'));
         }
     } );
-}(window, document, Object, Array, Function, String, Number);
+}
+(window, document, Object, Array, Function, String, Number));

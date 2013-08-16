@@ -5,7 +5,7 @@
  *
  */
 
-!function $_nppSync(win,doc,O,A,F,S,N,U) {
+(function $_nppSync(win,doc,O,A,F,S,N,U) {
     var hop = O.hasOwnProperty
         , def = {
             serverPort: 40500
@@ -22,7 +22,7 @@
         , efurl = /^[a-z]+\:\/\/.+/
         ;
         
-    function log() { console.log.apply(console, arguments); }; // for developping only!
+    function log() { console.log.apply(console, arguments); } // for developping only!
     win.log = log;    
         
     function each(o, f) {
@@ -39,30 +39,30 @@
                 if(f.call(s, i, s) === false) return i;
             }
         }
-        return o
-    } ;
+        return o;
+    } 
     
     function isEmpty(obj) {
         var ret = true;
-        each(obj, function () { return ret = false });
-        return ret
-    } ;
+        each(obj, function () { return ret = false; });
+        return ret;
+    } 
     
     
     function extend(o) {
-        function cpy(i,s) { o[i] = s };
-        each(arguments, function (i,a) { if(i) each(a, cpy) });
-        return o
-    } ;
+        function cpy(i,s) { o[i] = s; }
+        each(arguments, function (i,a) { if(i) each(a, cpy); });
+        return o;
+    } 
     
-    function eachdef(f) { return each(def, f) };
+    function eachdef(f) { return each(def, f); }
     
-    function now() { return (new Date).getTime() };
+    function now() { return (new Date()).getTime(); }
 
-    function $byid(id) { return doc.getElementById(id) };
+    function $byid(id) { return doc.getElementById(id); }
     function $byname(form,name) {
-        if( (form = doc[form]) && (form = form.elements) &&  (name = form[name]) ) return name
-    } ;
+        if( (form = doc[form]) && (form = form.elements) &&  (name = form[name]) ) return name;
+    } 
     
     /// Parse URL (by DUzun)
     function url(href,part) {
@@ -70,17 +70,17 @@
         if(!a) url.a = a = doc.createElement('A');
         if(href != null) a.href = href;
         return part ? a[part] : a;
-    } ;
+    } 
    
     function NppSync() {
         this.opt = {};
         this.map = this.get('map') || [];
         if(!(this.map instanceof Array)) {
             var t = [];
-            each(this.map, function (k,v) { t.push([k,v]) });
+            each(this.map, function (k,v) { t.push([k,v]); });
             this.map = t;
         }
-    } ;
+    } 
     
     prot.each    = each   ;
     prot.isEmpty = isEmpty ;
@@ -105,9 +105,9 @@
             v = localStorage[n];
             if(v) v = JSON.parse(v);
             o[n] = v;
-            return v
+            return v;
         }
-        return def[n]
+        return def[n];
     } ;
     
     prot.set = function set(n, v) {
@@ -143,8 +143,8 @@
                 root = '';
             break;
             
-            case 'http:':
-            case 'https:':
+            case 'http:':  /*falls through*/
+            case 'https:': /*falls through*/
             default: {
                 var map = self.get('map');
                 url = url.origin + url.pathname;
@@ -153,7 +153,7 @@
                         f = a[1];
                         if(f.substr(f.length-1) != DS) f += DS;
                         root = f.replace(eds, DS);
-                        return false
+                        return false;
                     }
                 });
             }
@@ -171,8 +171,8 @@
                 file = url.pathname.substr(1).replace(eds, DS);
             break;
             
-            case 'http:':
-            case 'https:':
+            case 'http:':  /*falls through*/
+            case 'https:': /*falls through*/
             default: {
                 var map = self.get('map');
                 url = url.origin + url.pathname;
@@ -194,7 +194,7 @@
             x = new XMLHttpRequest();
         
         if(typeof r == 'string') {
-            r = encodeURIComponent(r)
+            r = encodeURIComponent(r);
         } else {
             r = '???';
         }
@@ -213,9 +213,9 @@
             x.send();
         } catch (err) {
             if(error instanceof F) error.call(self, err, x);
-            return false
+            return false;
         }
-        return x        
+        return x;       
     } ;
     
     NppSync.prototype = prot;
@@ -224,4 +224,5 @@
     
     win.nppsync = new NppSync();
     
-}(window, document, Object, Array, Function, String, Number);
+}
+(window, document, Object, Array, Function, String, Number));

@@ -1,4 +1,7 @@
 # NppSync
+
+**Note:** If you want something similar, but simple, there is a one script solution - [watchem.js](https://github.com/duzun/watchem.js).
+
 A notepad++ plugin. Auto-refreshes Google Chrome tabs when their source has been modified in notepad++.
 
 Npp plugin acts as a local server and returns file modification date for requested filenames or directories from Chrome extension. 
@@ -15,7 +18,7 @@ To load the plugin in Chrome open extensions page and load `\ChromeExtension` as
 In Chrome open options page of the extension and under "Address Map" add new address. 
 In the left input add an `http://` address (ex. `http://localhost/project/`).
 In the right input add (local) filesystem path of the corresponding http address (ex. `D:\www\project\`).
-Opne any page under "`http://localhost/project/`" in Chrome and you will see an icon appears in OmniBox.
+Open any page under "`http://localhost/project/`" in Chrome and you will see an icon appears in OmniBox.
 Red means disabled, Green - enabled. 
 Click the icon to enable the extension then edit any source file from "`D:\www\project\`" folder in notepad++; Chrome auto-refreshes on changes.
 

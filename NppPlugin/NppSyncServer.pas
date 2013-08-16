@@ -14,6 +14,8 @@ implementation
 uses
     NppSyncMain, SysUtils;
 
+const EOL: String = #13#10;    
+    
 var
     wsaData     : TWSAData;
     listenSocket: TSocket = INVALID_SOCKET;
@@ -45,9 +47,9 @@ var
 begin
     msg := aText;
     if (aCode = SOCKET_ERROR) then
-        msg := msg + #13#10 + GetErrorText(WSAGetLastError)
+        msg := msg + EOL + GetErrorText(WSAGetLastError)
     else
-        msg := msg + #13#10 + GetErrorText(aCode);
+        msg := msg + EOL + GetErrorText(aCode);
 
     MessageBox(0, PChar(msg), NPP_PLUGIN_NAME, MB_ICONERROR or MB_OK);
 end;
@@ -116,8 +118,8 @@ var
 
   function mkResponse(body: rawbytestring): rawbytestring; overload ;
   begin
-    Result := '200 HTTP/1.1 OK' + #13#10 +
-              'content-length: ' + TextFromInt(Length(body)) + #13#10#13#10 +
+    Result := '200 HTTP/1.1 OK' + EOL +
+              'content-length: ' + TextFromInt(Length(body)) + EOL + EOL +
               body;
   end;
 
