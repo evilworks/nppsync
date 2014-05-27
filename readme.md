@@ -15,6 +15,6 @@ When you open a file:// url in Chrome an icon appears in OmniBox. Red means disa
 Public domain/Free for all
 
 ## Changelog
-1.0.0 - Initial release
-1.1.0 - Now refreshes the page if any of the local scripts or styles linked in the head section have been modified as well. Remember to allow access to file URLs for NppSync on extensions page.
-1.2.0 - Fixed most bugs.
+1.0.0 - Initial release  
+1.1.0 - Now refreshes the page if any of the local scripts or styles linked in the head section have been modified as well. Remember to allow access to file URLs for NppSync on extensions page.  
+1.2.0 - Fixed most bugs.  
