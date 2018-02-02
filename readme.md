@@ -7,12 +7,14 @@ A notepad++ plugin. Auto-refreshes Google Chrome tabs when their source has been
 Npp plugin acts as a local server and returns file modification date for requested filenames or directories from Chrome extension. 
 By default polling is done every second on `http://localhost:40500/`, but this can be changed in options page.
 
-## Building and Installing
-You need Delphi XE2 on x86 Windows platform to build the npp plugin. 
-Open NppSync.dpr and build. 
-Put NppSync.dll in your plugins dir (either in appdata or in npp plugins subdir if you have a portable install).
+## Installing
+- Put `NppSync.dll` in your plugins dir (either in appdata or in npp plugins subdir if you have a portable install)
+- Install [NppSync](https://chrome.google.com/webstore/detail/nppsync/lnchindmhlepoocmobhlihmdpecckjhl) Chrome Extension
+- Alternatively you can load the unpacked extension from `ChromeExtension` folder
 
-To load the plugin in Chrome open extensions page and load `\ChromeExtension` as an unpacked extension.
+## Building
+You need Delphi XE2 on x86 Windows platform to build the npp plugin. 
+Open NppSync.dpr and build.
 
 ## Usage
 In Chrome open options page of the extension and under "Address Map" add new address. 
