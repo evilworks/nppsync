@@ -43,3 +43,5 @@ Track changing of any file in the path (open in npp) and refreshes browser page 
 
 1.3.1 - `<link href="*.css" />` are updated dynamically, without page refresh. 
 The href attribute get `&v=<hash>` appended at each .css file change.
+
+1.3.1 - Added support for `*.dev` domains and HTTPS for all supported domains.
