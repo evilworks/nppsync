@@ -27,7 +27,7 @@
   },
   "homepage": "https://chrome.google.com/webstore/detail/nppsync/lnchindmhlepoocmobhlihmdpecckjhl",
   "devDependencies": {
-    "verup": "^1.4"
+    "verup": "^1.6.2"
   },
   "extra": {
     "verup": {
