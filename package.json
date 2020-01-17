@@ -20,14 +20,14 @@
     "extension",
     "chrome"
   ],
-  "author": "Dumitru Uzun <contanct@duzun.me> (https://DUzun.Me)",
+  "author": "Dumitru Uzun <contact@duzun.me> (https://DUzun.Me)",
   "license": "UNLICENSED",
   "bugs": {
     "url": "https://github.com/duzun/nppsync/issues"
   },
   "homepage": "https://chrome.google.com/webstore/detail/nppsync/lnchindmhlepoocmobhlihmdpecckjhl",
   "devDependencies": {
-    "verup": "^1.6.2"
+    "verup": "^1.7.0"
   },
   "extra": {
     "verup": {
