@@ -2,11 +2,10 @@ library NppSync;
 
 {$R 'Resources.res' 'Resources.rc'}
 
-
 uses
-	Windows,
-	Messages,
-	NppPluginInterface,
+	Winapi.Windows,
+	Winapi.Messages,
+	NppPluginInterface in 'NppPluginInterface.pas',
 	NppSyncMain in 'NppSyncMain.pas',
 	NppSyncServer in 'NppSyncServer.pas',
 	NppPluginUtils in 'NppPluginUtils.pas';

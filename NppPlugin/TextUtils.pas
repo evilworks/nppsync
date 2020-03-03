@@ -158,7 +158,7 @@ type
 
 { Basic string handling }
 function TextPos(const aText, aSubText: string; const aCaseSens: boolean = False; const aOfs: Integer = 1): Integer;
-function TextCompare(const aTextA, aTextB: string): integer;
+{ function TextCompare(const aTextA, aTextB: string): integer; }
 function TextCopy(const aText: string; const aStartIdx, aCount: Integer): string;
 function TextUpCase(const aText: string): string;
 function TextLoCase(const aText: string): string;
@@ -257,8 +257,9 @@ function URIEncodeQueryString(const aStr: ansistring): string; overload;
 function URIDecodeQueryString(const aStr: string): string;
 
 implementation
+uses StrUtils, SysUtils;
 
-{ Lifted from StrUtils. }
+{ Lifted from StrUtils.
 function PosEx(const SubStr, S: string; Offset: integer = 1): integer;
 asm
 	TEST  EAX, EAX
@@ -403,7 +404,7 @@ asm
 	POP   ESI
 end;
 
-{ Lifted from SysUtils. }
+{ Lifted from SysUtils.
 function SameText(const aTextA, aTextB: string): Boolean; assembler;
 asm
     CMP     EAX,EDX
@@ -432,7 +433,7 @@ begin
 		Result := PosEx(aSubText, aText, aOfs);
 end;
 
-{ Lifted from SysUtils (CompareText). }
+{ Lifted from SysUtils (CompareText).
 function TextCompare(const aTextA, aTextB: string): integer;
 // The function CompareText is licensed under the CodeGear license terms.
 // The initial developer of the original code is Fastcode
@@ -493,7 +494,7 @@ asm
 	NEG    ECX
 	JZ     @@SetResult                //Exit if Smallest Length = 0
 @@Loop:                               //Load Next 2 Chars from S1 and S2
-	//May Include Null Terminator}
+	//May Include Null Terminator
 	MOV    EAX, [ESI+ECX*2]
 	MOV    EBX, [EDX+ECX*2]
 	CMP    EAX,EBX
@@ -578,8 +579,8 @@ begin
 	SetLength(Result, Length(aText));
 	for i := 0 to Length(aText) - 1 do
 	begin
-		if (aText[i] in ['a' .. 'z']) then
-			Result[i] := char(Ord(aText[i]) - 32)
+		if CharInSet(aText[i], ['a' .. 'z']) then
+			Result[i] := char(Ord(aText[i]) and not $20)
 		else
 			Result[i] := aText[i];
 	end;
@@ -593,8 +594,8 @@ begin
 	SetLength(Result, Length(aText));
 	for i := 0 to Length(aText) - 1 do
 	begin
-		if (aText[i] in ['A' .. 'Z']) then
-			Result[i] := char(Ord(aText[i]) + 32)
+		if CharInSet(aText[i], ['A' .. 'Z']) then
+			Result[i] := char(Ord(aText[i]) or $20)
 		else
 			Result[i] := aText[i];
 	end;
@@ -2094,9 +2095,9 @@ begin
 		j := aEnd;
 		p := (a + aEnd) shr 1;
 		repeat
-			while (TextCompare(FTokens[i], FTokens[p]) < 0) do
+			while (CompareText(FTokens[i], FTokens[p]) < 0) do
 				Inc(i);
-			while (TextCompare(FTokens[j], FTokens[p]) > 0) do
+			while (CompareText(FTokens[j], FTokens[p]) > 0) do
 				Dec(j);
 			if (i <= j) then
 			begin

@@ -1,8 +1,14 @@
-﻿# Compiled source #
+# Node.js #
+node_modules/
+
+# Chrome Extension #
+###################
+
+
+# Compiled source #
 ###################
 *.com
 *.class
-*.dll
 *.exe
 *.o
 *.so
